@@ -28,14 +28,17 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    if (!email || !password){
+        return res.status(400).send("Email or password missing from request");
+    }
     const usuario = await User.findOne({email}).select("+password");
 
     if (!usuario){
-        res.status(404).send("Error: User does not exist");
+        return res.status(404).send("Error: User not found");
     }
 
     if (! await bcrypt.compare(password, usuario.password)){
-        res.status(403).send("Error: passwords do not match");
+        return res.status(403).send("Error: passwords do not match");
     }
 
     //A partir daqui, usuario existe e entrou com a senha correta.
@@ -44,7 +47,7 @@ router.post("/login", async (req, res) => {
         expiresIn: 86400,
     });
 
-    res.send({usuario, token});
+    return res.send({usuario, token});
 })
 
 module.exports = (app) => app.use("/auth", router);
