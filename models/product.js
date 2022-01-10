@@ -11,6 +11,11 @@ const productSchema = new mongoose.Schema({
     },
     added: {
         type: Date,
+        default: Date.now,
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
     }
 })
 
