@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const MongoClient = require("mongodb").MongoClient;
 const mongoose = require("mongoose");
+require('dotenv').config();
 
 //Definicoes e configuracoes
 const app = express();

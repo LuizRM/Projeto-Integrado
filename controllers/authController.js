@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken");
 const authConfig = require("../config/auth.json");
 const User = require("../models/user")
 
+
 const router = express.Router();
+
 
 router.post("/register", async (req, res) => {
     const {email} = req.body
@@ -19,7 +21,7 @@ router.post("/register", async (req, res) => {
         console.log("Erro a seguir: ");
         console.log(err);
         res.status(400).send({
-            error: "registration error!", 
+            error: "Registration error!", 
             recebido: req.body,
             erro: err,
         });
@@ -38,7 +40,7 @@ router.post("/login", async (req, res) => {
     }
 
     if (! await bcrypt.compare(password, usuario.password)){
-        return res.status(403).send("Error: passwords do not match");
+        return res.status(403).send("Error: email or password wrong");
     }
 
     //A partir daqui, usuario existe e entrou com a senha correta.

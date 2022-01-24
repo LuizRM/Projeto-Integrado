@@ -1,8 +1,11 @@
 const Product = require("../models/product");
 const User = require("../models/user");
 const express = require("express");
+const authMiddleware = require("../middlewares/authkey");
+
 
 const router = express.Router();
+router.use(authMiddleware);
 
 router.put("/", async (req, res) => {
     try{
@@ -17,8 +20,21 @@ router.put("/", async (req, res) => {
 
 router.get("/:productid", async (req, res) => {
     try{
-        const produtoAchado = await Product.find({user: req.params.productid});
+        const produtoAchado = await Product.findById(req.params.productid);
+        if (!produtoAchado){
+            return res.status(404).send("Product not found")
+        }
         return res.status(200).send(produtoAchado);
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send("Bad request");
+    }
+})
+
+router.get("/user/:userid", async (req, res) => {
+    try{
+        const produtosAchados = await Product.find({user: req.params.userid});
+        return res.status(200).send(produtosAchados);
     } catch (err) {
         console.log(err);
         return res.status(404).send("Product not found");
