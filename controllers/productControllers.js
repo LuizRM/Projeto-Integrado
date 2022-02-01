@@ -9,12 +9,12 @@ router.use(authMiddleware);
 
 router.put("/", async (req, res) => {
     try{
-        const novoProduto = await Product.create(req.body);
+        let cadastro = req.body;
+        cadastro.user = req.userId;
+        const novoProduto = await Product.create(cadastro);
         return res.status(200).send(novoProduto);
     } catch (err) {
-        console.log("Erro a seguir: ");
-        console.log(err);
-        return res.status(400).send("No good");
+        return res.status(500).send("Error: " + err);
     }
 })
 
@@ -26,28 +26,35 @@ router.get("/:productid", async (req, res) => {
         }
         return res.status(200).send(produtoAchado);
     } catch (err) {
-        console.log(err);
-        return res.status(400).send("Bad request");
+        return res.status(500).send(err.name + ". Path: " + err.path + ". Value: " + err.value);
     }
 })
 
 router.get("/user/:userid", async (req, res) => {
     try{
         const produtosAchados = await Product.find({user: req.params.userid});
+        if (produtosAchados.length === 0){
+            return res.status(404).send("No products found for this user");
+        }
         return res.status(200).send(produtosAchados);
     } catch (err) {
-        console.log(err);
-        return res.status(404).send("Product not found");
+        return res.status(500).send(err.name + ". Path: " + err.path + ". Value: " + err.value);
     }
 })
 
 router.delete("/:productid", async (req, res) => {
     try{
-        const produtoAchado = await Product.findByIdAndDelete(req.params.productid);
-        return res.status(200).send(produtoAchado);
+        const produtoAchado = await Product.findById(req.params.productid);
+        if (!produtoAchado){
+            return res.status(404).send("Product not found");
+        }
+        if (req.userId !== produtoAchado.user.toString()){
+            return res.status(403).send("You do not own this product!");
+        }
+        await Product.findByIdAndDelete(req.params.productid);
+        return res.status(200).send("Product deleted");
     } catch (err) {
-        console.log(err);
-        return res.status(404).send("Product not found");
+        return res.status(500).send(err.name + ". Path: " + err.path + ". Value: " + err.value);
     }
 })
 
