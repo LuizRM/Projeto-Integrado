@@ -21,7 +21,7 @@ mongoose.connect(uri, (err, client) => {
     console.log("Conectou no banco");
 })
 
-app.listen(3000, () => console.log("Servidor rodando!"));
+app.listen(process.env.PORT || 3000, () => console.log("Servidor rodando!"));
 
 //Importação dos controllers
 require("./controllers/authController")(app);
