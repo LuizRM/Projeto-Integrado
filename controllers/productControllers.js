@@ -31,6 +31,9 @@ router.get("/:productid", async (req, res) => {
 })
 
 router.get("/user/:userid", async (req, res) => {
+    if (req.userId !== req.params.userid){
+        return res.status(403).send("You do not own these products!");
+    }
     try{
         const produtosAchados = await Product.find({user: req.params.userid});
         if (produtosAchados.length === 0){

@@ -1,7 +1,7 @@
 //Importacao de bibliotecas
 const express = require("express");
 const bodyParser = require("body-parser");
-const MongoClient = require("mongodb").MongoClient;
+const cors = require("cors");
 const mongoose = require("mongoose");
 require('dotenv').config();
 
@@ -9,6 +9,7 @@ require('dotenv').config();
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors());
 
 const uri = process.env.mongodb;
 
