@@ -21,13 +21,11 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    products: [{
-        
-    }]
 })
 
 userSchema.pre('save', async function(next) {
-    const hash = await bcrypt.hash(this.password, 10);
+    const salt = bcrypt.genSaltSync();
+    const hash = await bcrypt.hash(this.password, salt);
     this.password = hash;
 })
 

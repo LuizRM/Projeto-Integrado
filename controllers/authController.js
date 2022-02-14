@@ -18,38 +18,43 @@ router.post("/register", async (req, res) => {
 
         return res.send(novoUsuario);
     } catch (err) {
-        console.log("Erro a seguir: ");
-        console.log(err);
-        res.status(400).send({
-            error: "Registration error!", 
-            recebido: req.body,
-            erro: err,
+        res.status(500).send({
+            message: "Internal server error. Registration error!", 
+            received: req.body,
+            error: err,
         });
     }
 })
 
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    //Requisicao faltando informacoes
     if (!email || !password){
         return res.status(400).send("Email or password missing from request");
     }
-    const usuario = await User.findOne({email}).select("+password");
 
-    if (!usuario){
-        return res.status(404).send("Error: User not found");
+    //Busca no banco
+    try{
+        const usuario = await User.findOne({email}).select("+password");
+        //Usuario nao encontrado
+        if (!usuario){
+            return res.status(404).send("Error: User not found");
+        }
+        //Senha nao corresponde
+        if (! await bcrypt.compare(password, usuario.password)){
+            return res.status(403).send("Error: email or password wrong");
+        }
+
+        //A partir daqui, usuario existe e entrou com a senha correta.
+        usuario.password = undefined;
+        const token =jwt.sign({ id: usuario.id }, authConfig.secret, {
+            expiresIn: 86400,
+        });
+
+        return res.send({usuario, token});
+    } catch (error) {
+        return res.status(500).send("Internal server error. Login error!");
     }
-
-    if (! await bcrypt.compare(password, usuario.password)){
-        return res.status(403).send("Error: email or password wrong");
-    }
-
-    //A partir daqui, usuario existe e entrou com a senha correta.
-    usuario.password = undefined;
-    const token =jwt.sign({ id: usuario.id }, authConfig.secret, {
-        expiresIn: 86400,
-    });
-
-    return res.send({usuario, token});
 })
 
 module.exports = (app) => app.use("/auth", router);
