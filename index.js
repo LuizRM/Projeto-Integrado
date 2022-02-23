@@ -28,6 +28,7 @@ app.listen(process.env.PORT || 3000, () => console.log("Servidor rodando!"));
 require("./controllers/authController")(app);
 require("./controllers/infoControllers")(app);
 require("./controllers/productControllers")(app);
+require("./controllers/searchController")(app);
 
 app.get("/", (req, res) => {
     res.send("Seu acesso foi computado!");
